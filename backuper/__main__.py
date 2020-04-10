@@ -109,7 +109,7 @@ def main():
 
     Logger().log("Searching files. This can take a while ...")
     files = [os.path.join(dirPath, f) for dirPath, _, fileNames in os.walk(args.fromFolder) for f in fileNames if rExp.match(f)]
-    Logger().log("I've searched {} files.".format(len(files)))
+    Logger().log("I've find {} files.".format(len(files)))
 
     for f in tqdm(files, desc="copy", unit="file"):
         copyfile(f, os.path.join(args.toFolder, f[len(args.fromFolder):]))
