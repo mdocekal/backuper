@@ -86,7 +86,7 @@ def main():
         "document": {"doc", "docx", "odt", "pdf", "rtf", "tex", "txt", "wpd", "ods", "xls", "xlsm", "xlsx"},
         "email": {"email", "eml", "emlx", "msg", "oft", "ost", "pst", "vcf"},
         "audio": {"aif", "cda", "midi", "mp3", "mpa", "ogg", "wav", "wma", "wpl"},
-        "database": {"csv", "dat", "dbf", "log", "mdb", ",", "sql", "tar", "xml"},
+        "database": {"csv", "dat", "dbf", "log", "mdb", "sql", "tar", "xml"},
         "compressed": {"7z", "arj", "deb", "pkg", "rar", "rpm", "gz", "zip"}
     }
 

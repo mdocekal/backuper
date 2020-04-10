@@ -63,7 +63,7 @@ There is exhaustive list of all file types and assigned extensions.
 
 * database
 
-    - csv, dat, dbf, log, mdb, ,, sql, tar, xml
+    - csv, dat, dbf, log, mdb, sql, tar, xml
 
 * compressed
 
