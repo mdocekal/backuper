@@ -108,11 +108,25 @@ def main():
     rExp = re.compile(".*\.({})$".format("|".join(searchExtensions)), flags=re.IGNORECASE)
 
     Logger().log("Searching files. This can take a while ...")
-    files = [os.path.join(dirPath, f) for dirPath, _, fileNames in os.walk(args.fromFolder) for f in fileNames if rExp.match(f)]
+    files = []
+
+    for dirPath, _, fileNames in os.walk(args.fromFolder):
+        for f in fileNames:
+            srcPath = os.path.join(dirPath, f)
+            if rExp.match(f) and os.path.exists(srcPath):
+                files.append(srcPath)
+
     Logger().log("I've find {} files.".format(len(files)))
 
     for f in tqdm(files, desc="copy", unit="file"):
-        copyfile(f, os.path.join(args.toFolder, f[len(args.fromFolder):]))
+        tmpP = f[len(args.fromFolder):]
+        if tmpP.startswith(os.sep):
+            tmpP = tmpP[len(os.sep):]
+
+        copyTo = os.path.join(args.toFolder, tmpP)
+
+        os.makedirs(os.path.dirname(copyTo), exist_ok=True)
+        copyfile(f, copyTo)
 
     if args.fileList:
         with open(args.fileList, "w") as listF:
