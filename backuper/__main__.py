@@ -11,10 +11,9 @@ import os
 import re
 import sys
 from argparse import ArgumentParser
-
 from tqdm import tqdm
 from windpyutils.logger import Logger
-
+from slugify import slugify
 
 class ArgumentParserError(Exception):
     """
@@ -58,6 +57,10 @@ class ArgumentsManager(object):
         parser.add_argument("--compressed", help="Backup all compressed files.", action='store_true')
 
         parser.add_argument("--fileList", help="Save list of copied files to given file.", type=str)
+        parser.add_argument("--skipInvalid",
+                            help="By default all problematic file paths for target system are automatically "
+                                 "converted, but if you use this they will be skipped.",
+                            action='store_true')
 
         if len(sys.argv) < 2:
             parser.print_help()
@@ -93,7 +96,7 @@ def main():
     def log(txt):
         print("{} : INFO : {}".format(datetime.datetime.now(), txt), file=sys.stderr, flush=True)
 
-    Logger().registerObserver("LOG", log)
+    Logger().register_observer("LOG", log)
 
     # select all extensions we will be searching for
 
@@ -116,22 +119,33 @@ def main():
             if rExp.match(f) and os.path.exists(srcPath):
                 files.append(srcPath)
 
-    Logger().log("I've find {} files.".format(len(files)))
+    Logger().log("I've found {} files.".format(len(files)))
 
-    for f in tqdm(files, desc="copy", unit="file"):
+    filesCopyTo = []
+    for f in tqdm(files, desc="copying", unit="file"):
         tmpP = f[len(args.fromFolder):]
         if tmpP.startswith(os.sep):
             tmpP = tmpP[len(os.sep):]
 
         copyTo = os.path.join(args.toFolder, tmpP)
-
-        os.makedirs(os.path.dirname(copyTo), exist_ok=True)
-        copyfile(f, copyTo)
+        try:
+            os.makedirs(os.path.dirname(copyTo), exist_ok=True)
+            copyfile(f, copyTo)
+            filesCopyTo.append(copyTo)
+        except OSError:
+            if not args.skipInvalid:
+                tmpP = os.sep.join([slugify(x) for x in tmpP.split(os.sep)])
+                copyTo = os.path.join(args.toFolder, tmpP)
+                os.makedirs(os.path.dirname(copyTo), exist_ok=True)
+                copyfile(f, copyTo)
+                filesCopyTo.append(copyTo)
+            else:
+                filesCopyTo.append("")
 
     if args.fileList:
         with open(args.fileList, "w") as listF:
-            for f in files:
-                listF.write("\t ".join([os.path.abspath(f), os.path.abspath(os.path.join(args.toFolder, f[len(args.fromFolder):]))]))
+            for f, cp2 in zip(files, filesCopyTo):
+                listF.write("\t ".join([os.path.abspath(f), os.path.abspath(cp2)]))
                 listF.write("\n")
 
 

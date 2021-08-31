@@ -11,7 +11,7 @@ with open('README.md') as readme_file:
 
 setup_args = dict(
     name='backuper',
-    version='1.0.0',
+    version='1.0.1',
     description='Tiny tool for fast backup of files. ',
     long_description_content_type="text/markdown",
     long_description=README,
