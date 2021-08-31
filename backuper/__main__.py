@@ -140,12 +140,12 @@ def main():
                 copyfile(f, copyTo)
                 filesCopyTo.append(copyTo)
             else:
-                filesCopyTo.append("")
+                filesCopyTo.append(None)
 
     if args.fileList:
         with open(args.fileList, "w") as listF:
             for f, cp2 in zip(files, filesCopyTo):
-                listF.write("\t ".join([os.path.abspath(f), os.path.abspath(cp2)]))
+                listF.write("\t ".join([os.path.abspath(f), "None" if cp2 is None else os.path.abspath(cp2)]))
                 listF.write("\n")
 
 
